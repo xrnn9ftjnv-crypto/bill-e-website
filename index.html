@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bill-e — Digitale bonnen, automatisch</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #0f5238;
+      --green-light: #e8f4ee;
+      --green-mid: #1a7a52;
+      --green-pale: #f0f5f0;
+      --green-pale-border: #cddcce;
+      --green-pale-dark: #deeede;
+      --accent: #c8f542;
+      --text: #0a0a0a;
+      --muted: #6b7280;
+      --muted-dark: #4a5568;
+      --border: #e5e7eb;
+      --bg: #fafaf8;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 48px;
+      background: rgba(240,245,240,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--green-pale-border);
+    }
+
+    .logo {
+      font-family: 'Instrument Serif', serif;
+      font-size: 22px;
+      color: var(--green);
+      letter-spacing: -0.5px;
+    }
+
+    .logo span { color: var(--green-mid); font-style: italic; }
+
+    nav a {
+      text-decoration: none;
+      color: var(--muted-dark);
+      font-size: 14px;
+      font-weight: 400;
+      transition: color 0.2s;
+    }
+
+    nav a:hover { color: var(--text); }
+    .nav-links { display: flex; gap: 32px; align-items: center; }
+
+    .btn-nav {
+      background: var(--green);
+      color: #fff !important;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      transition: background 0.2s !important;
+    }
+
+    .btn-nav:hover { background: var(--green-mid) !important; }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 48px;
+      padding: 120px 72px 80px;
+      background: var(--green-pale);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-text {
+      flex: 1;
+      max-width: 520px;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green-pale-dark);
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 6px 14px;
+      border-radius: 100px;
+      margin-bottom: 32px;
+      opacity: 0;
+      animation: fadeUp 0.6s ease 0.1s forwards;
+    }
+
+    .hero-tag::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    h1 {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(44px, 6vw, 80px);
+      line-height: 1.05;
+      letter-spacing: -2px;
+      color: var(--text);
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.2s forwards;
+    }
+
+    h1 em { font-style: italic; color: var(--green); }
+
+    .hero-sub {
+      margin-top: 24px;
+      font-size: 17px;
+      color: var(--muted-dark);
+      max-width: 420px;
+      line-height: 1.65;
+      font-weight: 300;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.35s forwards;
+    }
+
+    .hero-cta {
+      margin-top: 40px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      opacity: 0;
+      animation: fadeUp 0.7s ease 0.5s forwards;
+    }
+
+    .btn-primary {
+      background: var(--green);
+      color: #fff;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s;
+      display: inline-block;
+    }
+
+    .btn-primary:hover { background: var(--green-mid); transform: translateY(-1px); }
+
+    .btn-secondary {
+      color: var(--text);
+      font-size: 15px;
+      font-weight: 400;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 14px 4px;
+      border-bottom: 1px solid var(--green-pale-border);
+      transition: border-color 0.2s;
+    }
+
+    .btn-secondary:hover { border-color: var(--text); }
+
+    /* RECEIPT MOCKUP */
+    .hero-visual {
+      flex-shrink: 0;
+      opacity: 0;
+      animation: fadeUp 0.8s ease 0.55s forwards;
+    }
+
+    .receipt-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 32px;
+      width: 300px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+      text-align: left;
+      position: relative;
+    }
+
+    .receipt-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .receipt-merchant {
+      font-family: 'Instrument Serif', serif;
+      font-size: 18px;
+      color: var(--text);
+    }
+
+    .receipt-badge {
+      background: var(--green-light);
+      color: var(--green);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .receipt-divider { height: 1px; background: var(--border); margin: 16px 0; }
+
+    .receipt-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 0;
+      font-size: 13px;
+      color: var(--text);
+    }
+
+    .receipt-item-name { font-weight: 400; }
+    .receipt-item-price { font-weight: 500; }
+
+    .receipt-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 12px;
+      margin-top: 4px;
+      border-top: 1px solid var(--border);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .receipt-meta { margin-top: 16px; font-size: 11px; color: var(--muted); }
+
+    .pulse-dot {
+      position: absolute;
+      top: -6px; right: -6px;
+      width: 12px; height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    /* SECTION SHARED */
+    section {
+      padding: 96px 72px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(32px, 4vw, 52px);
+      line-height: 1.1;
+      letter-spacing: -1px;
+      max-width: 560px;
+    }
+
+    .section-title em { font-style: italic; color: var(--green); }
+
+    /* HOW IT WORKS */
+    .how { border-top: 1px solid var(--border); }
+
+    .how-intro {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: end;
+      margin-bottom: 64px;
+    }
+
+    .how-desc {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-weight: 300;
+      max-width: 380px;
+      align-self: end;
+    }
+
+    /* PHASE BLOCKS */
+    .phases { display: flex; flex-direction: column; gap: 24px; }
+
+    .phase {
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      background: #fff;
+      transition: box-shadow 0.2s;
+    }
+
+    .phase:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.06); }
+
+    .phase-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 28px 32px 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .phase-pill {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+
+    .phase-pill.live { background: #dcfce7; color: #166534; }
+    .phase-pill.future { background: #f3f4f6; color: #6b7280; }
+
+    .phase-title {
+      font-family: 'Instrument Serif', serif;
+      font-size: 22px;
+      letter-spacing: -0.5px;
+    }
+
+    .phase-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .phase-steps {
+      padding: 32px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      border-right: 1px solid var(--border);
+    }
+
+    .phase-step {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .phase-step-icon {
+      width: 34px;
+      height: 34px;
+      background: var(--green-pale);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .phase-step-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+    .phase-step-desc { font-size: 13px; color: var(--muted); line-height: 1.6; font-weight: 300; }
+
+    .phase-detail {
+      padding: 32px 32px;
+      background: var(--green-pale);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .phase-detail-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #5a7a64;
+      margin-bottom: 12px;
+    }
+
+    .phase-note {
+      font-size: 13px;
+      color: var(--muted-dark);
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    .phase-note strong { color: var(--text); font-weight: 500; }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--green-pale-dark);
+      color: #2d6a4f;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: 100px;
+      margin-top: 20px;
+    }
+
+    /* FOR WHO */
+    .for-who { border-top: 1px solid var(--border); }
+
+    .audience-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+
+    .audience-card {
+      padding: 32px 28px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: #fff;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .audience-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.06); }
+
+    .audience-card:first-child {
+      background: var(--green);
+      border-color: var(--green);
+      color: #fff;
+    }
+
+    .audience-card:first-child .audience-desc { color: rgba(255,255,255,0.7); }
+    .audience-card:first-child .audience-title { color: #fff; }
+
+    .audience-icon { margin-bottom: 16px; }
+    .audience-title { font-size: 16px; font-weight: 500; margin-bottom: 8px; color: var(--text); }
+    .audience-desc { font-size: 14px; color: var(--muted); line-height: 1.6; font-weight: 300; }
+
+    /* CONTACT */
+    .contact {
+      border-top: 1px solid var(--green-pale-border);
+      background: var(--green-pale);
+      text-align: center;
+      padding: 96px 72px;
+    }
+
+    .contact .section-title { margin: 0 auto 16px; }
+    .contact-sub { font-size: 16px; color: var(--muted-dark); font-weight: 300; margin-bottom: 40px; }
+
+    .contact-form {
+      display: flex;
+      gap: 12px;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    input[type="email"] {
+      flex: 1;
+      padding: 14px 18px;
+      border: 1px solid var(--green-pale-border);
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: 'DM Sans', sans-serif;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="email"]:focus { border-color: var(--green); }
+    input[type="email"]::placeholder { color: var(--muted); }
+
+    button[type="submit"] {
+      background: var(--green);
+      color: #fff;
+      border: none;
+      padding: 14px 24px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 500;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    button[type="submit"]:hover { background: var(--green-mid); }
+    .contact-note { margin-top: 16px; font-size: 12px; color: var(--muted); }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--green-pale-border);
+      padding: 32px 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--green-pale);
+    }
+
+    .footer-logo { font-family: 'Instrument Serif', serif; font-size: 18px; color: var(--green); }
+    .footer-logo span { font-style: italic; }
+    .footer-copy { font-size: 13px; color: var(--muted); }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.6; }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      nav { padding: 16px 24px; }
+      .nav-links { gap: 16px; }
+      .hero { flex-direction: column; padding: 100px 24px 60px; gap: 40px; }
+      .hero-text { max-width: 100%; }
+      .hero-visual { width: 100%; display: flex; justify-content: center; }
+      section { padding: 64px 24px; }
+      .how-intro { grid-template-columns: 1fr; gap: 24px; }
+      .phase-body { grid-template-columns: 1fr; }
+      .phase-steps { border-right: none; border-bottom: 1px solid var(--border); }
+      .phase-header { flex-wrap: wrap; }
+      .audience-grid { grid-template-columns: 1fr; }
+      .contact { padding: 64px 24px; }
+      .contact-form { flex-direction: column; }
+      footer { padding: 24px; flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">Bill<span>-e</span></div>
+    <div class="nav-links">
+      <a href="#hoe-werkt-het">Hoe het werkt</a>
+      <a href="#voor-wie">Voor wie</a>
+      <a href="#contact" class="btn-nav">Contact</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-text">
+      <div class="hero-tag">Nu actief in Apeldoorn — Fase 1</div>
+      <h1>Jouw bon, <em>automatisch</em> digitaal</h1>
+      <p class="hero-sub">Bill-e koppelt kassabonnen automatisch aan betalingen. Geen papier. Geen scannen. Altijd inzicht — voor consumenten én bedrijven.</p>
+      <div class="hero-cta">
+        <a href="#contact" class="btn-primary">Blijf op de hoogte</a>
+        <a href="#hoe-werkt-het" class="btn-secondary">Hoe het werkt →</a>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="receipt-card">
+        <div class="pulse-dot"></div>
+        <div class="receipt-header">
+          <div class="receipt-merchant">Koe</div>
+          <div class="receipt-badge">✓ Live</div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Dorpsstraat 1, Apeldoorn</div>
+        <div class="receipt-divider"></div>
+        <div class="receipt-item">
+          <span class="receipt-item-name">Cappuccino</span>
+          <span class="receipt-item-price">€ 3,50</span>
+        </div>
+        <div class="receipt-item">
+          <span class="receipt-item-name">Croissant</span>
+          <span class="receipt-item-price">€ 2,75</span>
+        </div>
+        <div class="receipt-item">
+          <span class="receipt-item-name">Appeltaart × 2</span>
+          <span class="receipt-item-price">€ 9,00</span>
+        </div>
+        <div class="receipt-item">
+          <span class="receipt-item-name">Jus d'orange</span>
+          <span class="receipt-item-price">€ 3,25</span>
+        </div>
+        <div class="receipt-total">
+          <span>Totaal</span>
+          <span>€ 18,50</span>
+        </div>
+        <div class="receipt-meta">BTW 9% — € 1,53 &nbsp;·&nbsp; 20 mei 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section class="how" id="hoe-werkt-het">
+    <div class="how-intro">
+      <div>
+        <div class="section-label reveal">Hoe het werkt</div>
+        <h2 class="section-title reveal">Twee fasen, <em>één visie</em></h2>
+      </div>
+      <p class="how-desc reveal">We bouwen stapsgewijs. Fase 1 is vandaag al operationeel bij onze eerste partner in Apeldoorn. Fase 2 brengt volledige automatisering — zonder extra hardware.</p>
+    </div>
+
+    <div class="phases">
+
+      <!-- PHASE 1 -->
+      <div class="phase reveal">
+        <div class="phase-header">
+          <div class="phase-pill live">● Nu live</div>
+          <div class="phase-title">Fase 1 — De bon wordt digitaal</div>
+        </div>
+        <div class="phase-body">
+          <div class="phase-steps">
+            <div class="phase-step">
+              <div class="phase-step-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0f5238" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M7 7h10M7 11h6"/>
+                </svg>
+              </div>
+              <div class="phase-step-text">
+                <div class="phase-step-title">Klant betaalt bij de kassa</div>
+                <div class="phase-step-desc">De klant betaalt zoals gewoonlijk. Er verandert niets aan het kassaproces — de bon print gewoon door.</div>
+              </div>
+            </div>
+            <div class="phase-step">
+              <div class="phase-step-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0f5238" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+                </svg>
+              </div>
+              <div class="phase-step-text">
+                <div class="phase-step-title">Bill-e legt de bon vast</div>
+                <div class="phase-step-desc">Op het moment van afdrukken legt Bill-e alle artikelen, bedragen en BTW vast en slaat dit veilig op in de cloud.</div>
+              </div>
+            </div>
+            <div class="phase-step">
+              <div class="phase-step-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0f5238" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/>
+                </svg>
+              </div>
+              <div class="phase-step-text">
+                <div class="phase-step-title">Klant opent de digitale bon</div>
+                <div class="phase-step-desc">Via een unieke link ziet de klant direct zijn volledige digitale bon. Geen app, geen account nodig.</div>
+              </div>
+            </div>
+          </div>
+          <div class="phase-detail">
+            <div class="phase-detail-label">Status</div>
+            <div class="phase-note"><strong>Nu operationeel bij Koe, Apeldoorn.</strong> Eerste echte transacties worden binnenkort live getest samen met onze eerste gebruikers.</div>
+            <div class="status-badge">● Fase 1 actief</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHASE 2 -->
+      <div class="phase reveal">
+        <div class="phase-header">
+          <div class="phase-pill future">Roadmap</div>
+          <div class="phase-title">Fase 2 — Automatisch via je bank</div>
+        </div>
+        <div class="phase-body">
+          <div class="phase-steps">
+            <div class="phase-step">
+              <div class="phase-step-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0f5238" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>
+                </svg>
+              </div>
+              <div class="phase-step-text">
+                <div class="phase-step-title">Klant koppelt zijn bankrekening eenmalig</div>
+                <div class="phase-step-desc">Via een veilige bankkoppeling herkent Bill-e automatisch welke betalingen je hebt gedaan — bij welke winkels, op welk moment.</div>
+              </div>
+            </div>
+            <div class="phase-step">
+              <div class="phase-step-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0f5238" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="8" cy="12" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="18" cy="18" r="3"/>
+                  <path d="M10.5 10.5l5-3M10.5 13.5l5 3"/>
+                </svg>
+              </div>
+              <div class="phase-step-text">
+                <div class="phase-step-title">Retailer deelt de bongegevens</div>
+                <div class="phase-step-desc">Aangesloten winkels sturen automatisch de bijbehorende bondata — zonder dat de klant iets hoeft te doen bij de kassa.</div>
+              </div>
+            </div>
+            <div class="phase-step">
+              <div class="phase-step-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0f5238" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 6L9 17l-5-5"/>
+                </svg>
+              </div>
+              <div class="phase-step-text">
+                <div class="phase-step-title">Alles staat automatisch klaar</div>
+                <div class="phase-step-desc">Consumenten zien al hun bonnen op één plek. ZZP'ers en MKB hebben hun administratie direct op orde.</div>
+              </div>
+            </div>
+          </div>
+          <div class="phase-detail">
+            <div class="phase-detail-label">Waarom dit werkt</div>
+            <div class="phase-note">Fase 1 bewijst dat de behoefte er is en bouwt retailerrelaties op. <strong>Fase 2 is de schaalbare business</strong> — geen hardware, geen installatie, geen gedoe.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOR WHO -->
+  <section class="for-who" id="voor-wie">
+    <div class="section-label reveal">Voor wie</div>
+    <h2 class="section-title reveal">Waardevol voor <em>iedereen</em> die betaalt</h2>
+
+    <div class="audience-grid">
+      <div class="audience-card reveal">
+        <div class="audience-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <div class="audience-title">Consumenten</div>
+        <div class="audience-desc">Automatisch overzicht van al je aankopen. Nooit meer bonnetjes bewaren. Splits uitgaven eenvoudig met anderen.</div>
+      </div>
+      <div class="audience-card reveal">
+        <div class="audience-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f5238" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+          </svg>
+        </div>
+        <div class="audience-title">ZZP'ers</div>
+        <div class="audience-desc">Zakelijke aankopen direct in je boekhouding. BTW automatisch bijgehouden. Klaar voor je aangifte zonder extra werk.</div>
+      </div>
+      <div class="audience-card reveal">
+        <div class="audience-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f5238" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/>
+          </svg>
+        </div>
+        <div class="audience-title">MKB</div>
+        <div class="audience-desc">Koppeling met Exact en Moneybird. Medewerkers declareren moeiteloos. Minder administratie, meer overzicht.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact" id="contact">
+    <div class="section-label reveal">Contact</div>
+    <h2 class="section-title reveal">Interesse? <em>Laat het ons weten</em></h2>
+    <p class="contact-sub reveal">We zoeken vroege partners, testlocaties en investeerders in Nederland.</p>
+    <form class="contact-form reveal" action="https://formspree.io/f/xpqnpjal" method="POST">
+      <input type="email" name="email" placeholder="jouw@emailadres.nl" required />
+      <button type="submit">Aanmelden</button>
+    </form>
+    <p class="contact-note reveal">Of mail direct naar <a href="mailto:hello@bill-e.com" style="color:var(--green)">hello@bill-e.com</a></p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Bill<span>-e</span></div>
+    <div class="footer-copy">© 2026 Bill-e — Apeldoorn, Nederland</div>
+  </footer>
+
+  <script>
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), i * 80);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>
