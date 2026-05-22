@@ -83,14 +83,19 @@
     /* HERO */
     .hero {
       min-height: 0;
+      background: var(--green-pale);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 120px 72px 80px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 64px;
-      padding: 120px 72px 80px;
-      background: var(--green-pale);
-      position: relative;
-      overflow: hidden;
     }
 
     .hero-text {
@@ -540,7 +545,7 @@
     @media (max-width: 768px) {
       nav { padding: 16px 24px; }
       .nav-links { gap: 16px; }
-      .hero { flex-direction: column; padding: 100px 24px 60px; gap: 40px; }
+      .hero-inner { flex-direction: column; padding: 100px 24px 60px; gap: 40px; }
       .hero-text { max-width: 100%; }
       .hero-visual { width: 100%; display: flex; justify-content: center; }
       section { padding: 64px 24px; }
@@ -569,6 +574,7 @@
 
   <!-- HERO -->
   <div class="hero">
+    <div class="hero-inner">
     <div class="hero-text">
       <div class="hero-tag">Nu actief in Apeldoorn — Fase 1</div>
       <h1>Jouw bon, <em>automatisch</em> digitaal</h1>
@@ -610,6 +616,7 @@
         </div>
         <div class="receipt-meta">BTW 9% — € 1,53 &nbsp;·&nbsp; 20 mei 2026</div>
       </div>
+    </div>
     </div>
   </div>
 
