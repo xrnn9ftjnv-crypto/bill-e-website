@@ -84,18 +84,18 @@
     .hero {
       min-height: 0;
       display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 48px;
-      padding: 96px 72px 64px;
+      align-items: center;
+      justify-content: center;
+      gap: 64px;
+      padding: 80px 72px 48px;
       background: var(--green-pale);
       position: relative;
       overflow: hidden;
     }
 
     .hero-text {
-      flex: 1;
-      max-width: 520px;
+      flex: 0 1 480px;
+      max-width: 480px;
     }
 
     .hero-tag {
@@ -187,6 +187,7 @@
       flex-shrink: 0;
       opacity: 0;
       animation: fadeUp 0.8s ease 0.55s forwards;
+      align-self: center;
     }
 
     .receipt-card {
