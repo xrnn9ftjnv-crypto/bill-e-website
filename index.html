@@ -1032,7 +1032,14 @@
     /* ─────────────── RESPONSIVE ─────────────── */
     @media (max-width: 900px) {
       .hero { padding: 56px 24px 72px; }
-      .hero-grid { grid-template-columns: 1fr; gap: 48px; }
+      .hero-grid {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "text"
+          "receipt"
+          "meta";
+        gap: 48px;
+      }
       .receipt-stage { justify-content: flex-start; }
       .band-inner { grid-template-columns: 1fr 1fr; padding: 22px 24px; gap: 24px; }
       .band-lede { grid-column: 1 / -1; }
@@ -1361,7 +1368,7 @@
           Korte berichten lezen we met aandacht.
         </p>
         <p class="contact-note">
-          Of mail direct naar <a href="/cdn-cgi/l/email-protection#12707760777c7652707b7e7e3f773c717d7f"><span class="__cf_email__" data-cfemail="e1838493848f85a183888d8dcc84cf828e8c">[email&#160;protected]</span></a>
+          Of mail direct naar <a href="/cdn-cgi/l/email-protection#35575047505b5175575c595918501b565a58"><span class="__cf_email__" data-cfemail="30525542555e547052595c5c1d551e535f5d">[email&#160;protected]</span></a>
         </p>
       </div>
 
