@@ -86,7 +86,7 @@
       --warm: #C84A2A;
     }
 
-    html { scroll-behavior: smooth; background: var(--bg); }
+    html { scroll-behavior: smooth; background: var(--bg); overflow-x: hidden; }
 
     body {
       font-family: 'Geist', system-ui, sans-serif;
@@ -215,9 +215,16 @@
       margin: 0 auto;
       display: grid;
       grid-template-columns: 1.15fr 0.85fr;
-      gap: 80px;
-      align-items: center;
+      grid-template-areas:
+        "text receipt"
+        "meta receipt";
+      column-gap: 80px;
+      row-gap: 48px;
+      align-items: start;
     }
+    .hero-text    { grid-area: text;    align-self: end; }
+    .receipt-stage{ grid-area: receipt; align-self: center; }
+    .hero-meta    { grid-area: meta;    align-self: start; }
 
     .eyebrow {
       display: inline-flex;
@@ -311,7 +318,7 @@
     .btn-ghost:hover { border-color: var(--ink); }
 
     .hero-meta {
-      margin-top: 64px;
+      margin-top: 24px;
       display: grid;
       grid-template-columns: repeat(3, minmax(0,1fr));
       gap: 0;
@@ -346,6 +353,9 @@
     }
     .receipt {
       width: 340px;
+      max-width: 100%;
+      position: relative;
+      z-index: 1;
       background: var(--paper);
       color: var(--ink);
       position: relative;
@@ -482,6 +492,7 @@
     /* postmark */
     .stamp {
       position: absolute;
+      z-index: 3;
       top: -22px;
       right: -28px;
       width: 96px; height: 96px;
@@ -774,6 +785,9 @@
     .who-tab:hover:not([data-active="true"]) { color: var(--ink); }
 
     .who-grid {
+      position: relative;
+    }
+    .who-grid-track {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 24px;
@@ -1027,7 +1041,15 @@
       .phase-body { grid-template-columns: 1fr; }
       .phase-steps { border-right: none; border-bottom: 1px solid var(--rule); }
       .phase-detail::before { display: none; }
-      .who-grid { grid-template-columns: 1fr; }
+      .who-grid { overflow: hidden; }
+      .who-grid-track {
+        display: flex;
+        gap: 0;
+        width: 100%;
+        transform: translateX(calc(var(--slide, 0) * -100%));
+        transition: transform .45s cubic-bezier(.5,.1,.1,1);
+      }
+      .who-grid-track > .who-card { flex: 0 0 100%; min-width: 0; }
       .contact-inner { grid-template-columns: 1fr; gap: 40px; padding: 72px 24px; }
       nav.top { padding: 14px 20px; }
       .nav-meta { display: none; }
@@ -1088,20 +1110,6 @@
           <a href="#contact" class="btn btn-primary">Blijf op de hoogte →</a>
           <a href="#hoe-werkt-het" class="btn btn-ghost">Hoe het werkt</a>
         </div>
-        <div class="hero-meta">
-          <div>
-            <span class="k">Status</span>
-            <span class="v">Operationeel</span>
-          </div>
-          <div>
-            <span class="k">Locatie</span>
-            <span class="v">Apeldoorn, NL</span>
-          </div>
-          <div>
-            <span class="k">Partner #01</span>
-            <span class="v">Koe</span>
-          </div>
-        </div>
       </div>
 
       <div class="receipt-stage">
@@ -1133,6 +1141,21 @@
             <span>20 / 05 / 26</span>
           </div>
 
+        </div>
+      </div>
+
+      <div class="hero-meta">
+        <div>
+          <span class="k">Status</span>
+          <span class="v">Operationeel</span>
+        </div>
+        <div>
+          <span class="k">Locatie</span>
+          <span class="v">Apeldoorn, NL</span>
+        </div>
+        <div>
+          <span class="k">Partner #01</span>
+          <span class="v">Koe</span>
         </div>
       </div>
     </div>
@@ -1292,6 +1315,7 @@
     </div>
 
     <div class="who-grid">
+      <div class="who-grid-track" id="who-grid-track">
       <div class="who-card reveal" data-card="consument" data-featured="true">
         <div class="who-num">PROFIEL · <b>01</b></div>
         <div class="who-title">Consumenten</div>
@@ -1322,6 +1346,7 @@
           <span class="tag">Declaraties</span>
         </div>
       </div>
+      </div>
     </div>
   </section>
 
@@ -1336,7 +1361,7 @@
           Korte berichten lezen we met aandacht.
         </p>
         <p class="contact-note">
-          Of mail direct naar <a href="/cdn-cgi/l/email-protection#74161106111a1034161d181859115a171b19"><span class="__cf_email__" data-cfemail="ff9d9a8d9a919bbf9d969393d29ad19c9092">[email&#160;protected]</span></a>
+          Of mail direct naar <a href="/cdn-cgi/l/email-protection#12707760777c7652707b7e7e3f773c717d7f"><span class="__cf_email__" data-cfemail="e1838493848f85a183888d8dcc84cf828e8c">[email&#160;protected]</span></a>
         </p>
       </div>
 
@@ -1457,12 +1482,16 @@
 
     // ─── Audience tabs (focus the selected card as featured) ─────────
     const tabs = document.querySelectorAll('#who-tabs .who-tab');
+    const whoOrder = ['consument', 'zzp', 'mkb'];
+    const whoTrack = document.getElementById('who-grid-track');
     tabs.forEach(tab => {
       tab.addEventListener('click', () => {
         tabs.forEach(t => t.dataset.active = String(t === tab));
         document.querySelectorAll('.who-card').forEach(c => {
           c.dataset.featured = String(c.dataset.card === tab.dataset.tab);
         });
+        const idx = whoOrder.indexOf(tab.dataset.tab);
+        if (whoTrack && idx >= 0) whoTrack.style.setProperty('--slide', idx);
       });
     });
 
