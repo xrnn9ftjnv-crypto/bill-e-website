@@ -6,7 +6,7 @@
   <title>Bill-e — Digitale bonnen, automatisch</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Geist:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-H6XSRJS7T6"></script>
   <script>
@@ -15,727 +15,1257 @@
     gtag('js', new Date());
     gtag('config', 'G-H6XSRJS7T6');
   </script>
+  <script id="tweak-defaults" type="application/json">
+  /*EDITMODE-BEGIN*/{
+    "palette": "bone",
+    "ticker": true,
+    "serifHeadline": true
+  }/*EDITMODE-END*/
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --green: #0f5238;
-      --green-light: #e8f4ee;
-      --green-mid: #1a7a52;
-      --green-pale: #f0f5f0;
-      --green-pale-border: #cddcce;
-      --green-pale-dark: #deeede;
-      --accent: #c8f542;
-      --text: #0a0a0a;
-      --muted: #6b7280;
-      --muted-dark: #4a5568;
-      --border: #e5e7eb;
-      --bg: #fafaf8;
+      /* default — "bone" palette, overwritten by JS on palette change */
+      --bg: #F1ECE0;
+      --paper: #FBF7EE;
+      --ink: #0E1116;
+      --ink-2: #2A2C2F;
+      --muted: #6F6A5E;
+      --rule: #D9D2C2;
+      --rule-strong: #B9B0A0;
+      --accent: #1F3A2E;        /* deep forest ink */
+      --accent-soft: #D8E2D8;
+      --signal: #C6FF4A;         /* citron lime — live/active only */
+      --signal-ink: #243600;
+      --warm: #C84A2A;           /* coral — used sparingly */
     }
 
-    html { scroll-behavior: smooth; }
+    html[data-palette="forest"] {
+      --bg: #EEF2EA;
+      --paper: #FAFCF7;
+      --ink: #0F1A14;
+      --ink-2: #243029;
+      --muted: #5D6B5F;
+      --rule: #D6DECF;
+      --rule-strong: #B4BFAA;
+      --accent: #0F5238;
+      --accent-soft: #DDE9DD;
+      --signal: #C8F542;
+      --signal-ink: #1E2E04;
+      --warm: #B85A2C;
+    }
+
+    html[data-palette="midnight"] {
+      --bg: #0B0E14;
+      --paper: #131822;
+      --ink: #ECE7DA;
+      --ink-2: #C9C3B4;
+      --muted: #8B8676;
+      --rule: #232A36;
+      --rule-strong: #3A4150;
+      --accent: #C6FF4A;
+      --accent-soft: #1A2412;
+      --signal: #C6FF4A;
+      --signal-ink: #0B0E14;
+      --warm: #FF8A5C;
+    }
+
+    html[data-palette="paper"] {
+      --bg: #FAF6EE;
+      --paper: #FFFFFF;
+      --ink: #1A1410;
+      --ink-2: #322820;
+      --muted: #7A6F60;
+      --rule: #E5DCC8;
+      --rule-strong: #C9BB9F;
+      --accent: #C84A2A;
+      --accent-soft: #FBE4D9;
+      --signal: #FFCB45;
+      --signal-ink: #3A2400;
+      --warm: #C84A2A;
+    }
+
+    html { scroll-behavior: smooth; background: var(--bg); }
 
     body {
-      font-family: 'DM Sans', sans-serif;
+      font-family: 'Geist', system-ui, sans-serif;
       background: var(--bg);
-      color: var(--text);
+      color: var(--ink);
+      font-weight: 400;
       overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
 
-    /* NAV */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
+    .serif { font-family: 'Newsreader', Georgia, serif; font-weight: 400; letter-spacing: -0.01em; }
+    .mono  { font-family: 'JetBrains Mono', ui-monospace, monospace; font-feature-settings: "ss01", "zero"; }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ─────────────── TICKER ─────────────── */
+    .ticker {
+      background: var(--ink);
+      color: var(--bg);
+      overflow: hidden;
+      border-bottom: 1px solid var(--ink);
+      height: 32px;
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+    .ticker-track {
+      display: flex;
+      gap: 48px;
+      white-space: nowrap;
+      animation: marquee 40s linear infinite;
+      padding-left: 48px;
+    }
+    .ticker-item {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: rgba(241,236,224,0.78);
+    }
+    .ticker-item .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--signal);
+      box-shadow: 0 0 10px var(--signal);
+    }
+    .ticker-item b { color: var(--bg); font-weight: 500; }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    html[data-ticker="off"] .ticker { display: none; }
+
+    /* ─────────────── NAV ─────────────── */
+    nav.top {
+      position: sticky; top: 0; z-index: 100;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 20px 48px;
-      background: rgba(240,245,240,0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--green-pale-border);
+      padding: 18px 40px;
+      background: color-mix(in oklab, var(--bg) 88%, transparent);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--rule);
     }
 
     .logo {
-      font-family: 'Instrument Serif', serif;
-      font-size: 22px;
-      color: var(--green);
-      letter-spacing: -0.5px;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 2px;
+      font-family: 'Newsreader', serif;
+      font-size: 26px;
+      letter-spacing: -0.02em;
+      color: var(--ink);
     }
+    .logo .e { font-style: italic; color: var(--accent); }
+    .logo .dash { color: var(--muted); margin: 0 1px; }
 
-    .logo span { color: var(--green-mid); font-style: italic; }
-
-    nav a {
-      text-decoration: none;
-      color: var(--muted-dark);
-      font-size: 14px;
-      font-weight: 400;
-      transition: color 0.2s;
-    }
-
-    nav a:hover { color: var(--text); }
-    .nav-links { display: flex; gap: 32px; align-items: center; }
-
-    .btn-nav {
-      background: var(--green);
-      color: #fff !important;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 13px !important;
-      font-weight: 500 !important;
-      transition: background 0.2s !important;
-    }
-
-    .btn-nav:hover { background: var(--green-mid) !important; }
-
-    /* HERO */
-    .hero {
-      min-height: 0;
-      background: var(--green-pale);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 120px 72px 80px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 64px;
-    }
-
-    .hero-text {
-      flex: 0 1 480px;
-      max-width: 480px;
-    }
-
-    .hero-tag {
+    .nav-meta {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      background: var(--green-pale-dark);
-      color: var(--green);
-      font-size: 12px;
+      gap: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .nav-meta .pulse {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--signal);
+      box-shadow: 0 0 0 0 color-mix(in oklab, var(--signal) 80%, transparent);
+      animation: pulse 2.2s infinite;
+    }
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 color-mix(in oklab, var(--signal) 70%, transparent); }
+      70%  { box-shadow: 0 0 0 10px transparent; }
+      100% { box-shadow: 0 0 0 0 transparent; }
+    }
+
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a { font-size: 13.5px; color: var(--ink-2); }
+    .nav-links a:hover { color: var(--accent); }
+    .nav-cta {
+      padding: 9px 16px;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: var(--bg) !important;
+      border-radius: 999px;
+      font-size: 13px !important;
       font-weight: 500;
-      padding: 6px 14px;
-      border-radius: 100px;
-      margin-bottom: 20px;
-      opacity: 0;
-      animation: fadeUp 0.6s ease 0.1s forwards;
+      transition: transform .15s ease, background .2s;
+    }
+    .nav-cta:hover { background: var(--accent); border-color: var(--accent); color: #fff !important; }
+
+    /* ─────────────── HERO ─────────────── */
+    .hero {
+      padding: 88px 40px 120px;
+      position: relative;
+    }
+    .hero-grid {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 80px;
+      align-items: center;
     }
 
-    .hero-tag::before {
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+    .eyebrow .bar { width: 24px; height: 1px; background: var(--rule-strong); }
+    .eyebrow b { color: var(--ink); font-weight: 500; }
+
+    h1.display {
+      font-family: 'Newsreader', serif;
+      font-weight: 400;
+      font-size: clamp(56px, 8vw, 112px);
+      line-height: 0.95;
+      letter-spacing: -0.035em;
+      color: var(--ink);
+    }
+    h1.display em {
+      font-style: italic;
+      color: var(--accent);
+      position: relative;
+    }
+    h1.display em::after {
       content: '';
-      width: 6px; height: 6px;
-      background: var(--green);
-      border-radius: 50%;
-      animation: pulse 2s infinite;
+      position: absolute;
+      left: 0; right: 0; bottom: 0.08em;
+      height: 0.12em;
+      background: var(--signal);
+      z-index: -1;
+      opacity: .85;
     }
+    html[data-palette="midnight"] h1.display em { color: var(--accent); }
+    html[data-palette="midnight"] h1.display em::after { background: var(--signal); opacity: .25; }
 
-    h1 {
-      font-family: 'Instrument Serif', serif;
-      font-size: clamp(44px, 6vw, 80px);
-      line-height: 1.05;
-      letter-spacing: -2px;
-      color: var(--text);
-      opacity: 0;
-      animation: fadeUp 0.7s ease 0.2s forwards;
+    html[data-serif="off"] h1.display,
+    html[data-serif="off"] .section-title,
+    html[data-serif="off"] .logo,
+    html[data-serif="off"] .receipt-merchant,
+    html[data-serif="off"] .phase-title {
+      font-family: 'Geist', sans-serif;
+      font-weight: 500;
+      letter-spacing: -0.025em;
     }
-
-    h1 em { font-style: italic; color: var(--green); }
+    html[data-serif="off"] h1.display em,
+    html[data-serif="off"] .section-title em { font-style: normal; }
 
     .hero-sub {
-      margin-top: 16px;
-      font-size: 17px;
-      color: var(--muted-dark);
-      max-width: 420px;
-      line-height: 1.65;
-      font-weight: 300;
-      opacity: 0;
-      animation: fadeUp 0.7s ease 0.35s forwards;
+      margin-top: 32px;
+      font-size: 18px;
+      line-height: 1.55;
+      max-width: 460px;
+      color: var(--ink-2);
+      font-weight: 400;
     }
 
     .hero-cta {
-      margin-top: 28px;
+      margin-top: 40px;
       display: flex;
-      gap: 12px;
       align-items: center;
-      opacity: 0;
-      animation: fadeUp 0.7s ease 0.5s forwards;
+      gap: 18px;
     }
-
-    .btn-primary {
-      background: var(--green);
-      color: #fff;
-      padding: 14px 28px;
-      border-radius: 10px;
-      font-size: 15px;
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 22px;
+      border-radius: 999px;
+      font-size: 14.5px;
       font-weight: 500;
-      text-decoration: none;
-      transition: background 0.2s, transform 0.15s;
-      display: inline-block;
+      transition: transform .15s ease, background .2s, color .2s;
     }
+    .btn-primary {
+      background: var(--ink);
+      color: var(--bg);
+      border: 1px solid var(--ink);
+    }
+    .btn-primary:hover { background: var(--accent); border-color: var(--accent); color: #fff; transform: translateY(-1px); }
+    html[data-palette="midnight"] .btn-primary:hover { color: var(--signal-ink); }
 
-    .btn-primary:hover { background: var(--green-mid); transform: translateY(-1px); }
+    .btn-ghost {
+      border: 1px solid var(--rule-strong);
+      color: var(--ink);
+      background: transparent;
+    }
+    .btn-ghost:hover { border-color: var(--ink); }
 
-    .btn-secondary {
-      color: var(--text);
-      font-size: 15px;
-      font-weight: 400;
-      text-decoration: none;
+    .hero-meta {
+      margin-top: 64px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 0;
+      max-width: 540px;
+      border-top: 1px solid var(--rule);
+      padding-top: 22px;
+    }
+    .hero-meta > div { padding-right: 16px; }
+    .hero-meta > div + div { border-left: 1px solid var(--rule); padding-left: 20px; }
+    .hero-meta .k {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: block;
+      margin-bottom: 6px;
+    }
+    .hero-meta .v {
+      font-family: 'Newsreader', serif;
+      font-size: 20px;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+    .hero-meta .v.small { font-size: 15px; font-family: 'Geist', sans-serif; }
+
+    /* ─────────────── RECEIPT ─────────────── */
+    .receipt-stage {
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+    .receipt {
+      width: 340px;
+      background: var(--paper);
+      color: var(--ink);
+      position: relative;
+      box-shadow:
+        0 1px 0 var(--rule-strong),
+        0 30px 60px -20px rgba(14,17,22,0.25),
+        0 18px 30px -25px rgba(14,17,22,0.35);
+      /* perforated edges via mask */
+      --d: 10px;
+      -webkit-mask:
+        radial-gradient(circle var(--d) at left, transparent 98%, #000 100%) left/100% calc(2*var(--d)) repeat-y,
+        radial-gradient(circle var(--d) at right, transparent 98%, #000 100%) right/100% calc(2*var(--d)) repeat-y,
+        linear-gradient(#000,#000);
+              mask:
+        radial-gradient(circle var(--d) at left, transparent 98%, #000 100%) left/100% calc(2*var(--d)) repeat-y,
+        radial-gradient(circle var(--d) at right, transparent 98%, #000 100%) right/100% calc(2*var(--d)) repeat-y,
+        linear-gradient(#000,#000);
+      -webkit-mask-composite: source-over, source-over, source-out;
+              mask-composite: add, add, exclude;
+      padding: 30px 30px 24px;
+    }
+    .receipt::before {
+      /* top tear edge */
+      content: '';
+      position: absolute;
+      left: 12px; right: 12px;
+      top: 0;
+      height: 8px;
+      background:
+        radial-gradient(circle 4px at 4px 0, transparent 98%, var(--paper) 100%) 0 0/8px 8px repeat-x;
+      pointer-events: none;
+    }
+    .receipt-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 6px;
+    }
+    .receipt-merchant {
+      font-family: 'Newsreader', serif;
+      font-size: 28px;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .receipt-live {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 14px 4px;
-      border-bottom: 1px solid var(--green-pale-border);
-      transition: border-color 0.2s;
-    }
-
-    .btn-secondary:hover { border-color: var(--text); }
-
-    /* RECEIPT MOCKUP */
-    .hero-visual {
-      flex-shrink: 0;
-      opacity: 0;
-      animation: fadeUp 0.8s ease 0.55s forwards;
-      align-self: center;
-    }
-
-    .receipt-card {
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 28px 32px;
-      width: 300px;
-      box-shadow: 0 24px 80px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
-      text-align: left;
-      position: relative;
-    }
-
-    .receipt-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-
-    .receipt-merchant {
-      font-family: 'Instrument Serif', serif;
-      font-size: 18px;
-      color: var(--text);
-    }
-
-    .receipt-badge {
-      background: var(--green-light);
-      color: var(--green);
-      font-size: 10px;
-      font-weight: 600;
-      padding: 4px 8px;
-      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      color: var(--signal-ink);
+      background: var(--signal);
+      padding: 4px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .receipt-live .d { width: 5px; height: 5px; border-radius: 50%; background: var(--signal-ink); }
+
+    .receipt-addr {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      margin-top: 6px;
     }
 
-    .receipt-divider { height: 1px; background: var(--border); margin: 16px 0; }
+    .receipt-rule { border-top: 1px dashed var(--rule-strong); margin: 18px 0 12px; }
 
-    .receipt-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 6px 0;
-      font-size: 13px;
-      color: var(--text);
+    .r-line {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      padding: 5px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--ink-2);
     }
+    .r-line .name { color: var(--ink); letter-spacing: 0.01em; }
+    .r-line .price { font-variant-numeric: tabular-nums; }
 
-    .receipt-item-name { font-weight: 400; }
-    .receipt-item-price { font-weight: 500; }
-
-    .receipt-total {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .r-total {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
       padding-top: 12px;
-      margin-top: 4px;
-      border-top: 1px solid var(--border);
-      font-size: 14px;
-      font-weight: 600;
+      margin-top: 6px;
+      border-top: 1px solid var(--ink);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.5px;
+      font-weight: 500;
+    }
+    .r-total .price { font-variant-numeric: tabular-nums; }
+
+    .r-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-top: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      color: var(--muted);
     }
 
-    .receipt-meta { margin-top: 16px; font-size: 11px; color: var(--muted); }
+    .r-barcode {
+      margin-top: 18px;
+      display: flex;
+      align-items: flex-end;
+      gap: 1px;
+      height: 36px;
+    }
+    .r-barcode i {
+      display: block;
+      width: 2px;
+      background: var(--ink);
+      height: 100%;
+    }
+    .r-barcode i.s { height: 70%; }
+    .r-barcode i.t { width: 3px; }
+    .r-barcode i.x { width: 1px; height: 85%; }
 
-    .pulse-dot {
+    .r-barcode-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.3em;
+      color: var(--muted);
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    /* postmark */
+    .stamp {
       position: absolute;
-      top: -6px; right: -6px;
-      width: 12px; height: 12px;
-      background: var(--accent);
+      top: -22px;
+      right: -28px;
+      width: 96px; height: 96px;
+      border: 1.5px solid var(--accent);
+      color: var(--accent);
       border-radius: 50%;
-      animation: pulse 2s infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transform: rotate(-12deg);
+      background: color-mix(in oklab, var(--paper) 70%, transparent);
+      backdrop-filter: blur(2px);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      text-align: center;
+      line-height: 1.35;
+    }
+    .stamp b { font-family: 'Newsreader', serif; font-size: 14px; font-style: italic; letter-spacing: 0; text-transform: none; font-weight: 400; display:block; margin: 2px 0; }
+
+    /* ─────────────── STATS BAND ─────────────── */
+    .band {
+      border-top: 1px solid var(--rule);
+      border-bottom: 1px solid var(--rule);
+      background: var(--paper);
+    }
+    .band-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 28px 40px;
+      display: grid;
+      grid-template-columns: 1.2fr repeat(3, 1fr);
+      gap: 40px;
+      align-items: center;
+    }
+    .band-lede {
+      font-family: 'Newsreader', serif;
+      font-style: italic;
+      font-size: 18px;
+      line-height: 1.35;
+      color: var(--ink-2);
+      letter-spacing: -0.01em;
+    }
+    .band-stat .num {
+      font-family: 'Newsreader', serif;
+      font-size: 40px;
+      letter-spacing: -0.03em;
+      color: var(--ink);
+      line-height: 1;
+    }
+    .band-stat .lbl {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 8px;
     }
 
-    /* SECTION SHARED */
+    /* ─────────────── SECTION ─────────────── */
     section {
-      padding: 96px 72px;
-      max-width: 1200px;
+      padding: 120px 40px;
+      max-width: 1280px;
       margin: 0 auto;
     }
 
-    .section-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--green);
-      margin-bottom: 16px;
-    }
-
-    .section-title {
-      font-family: 'Instrument Serif', serif;
-      font-size: clamp(32px, 4vw, 52px);
-      line-height: 1.1;
-      letter-spacing: -1px;
-      max-width: 560px;
-    }
-
-    .section-title em { font-style: italic; color: var(--green); }
-
-    /* HOW IT WORKS */
-    .how { border-top: 1px solid var(--border); }
-
-    .how-intro {
+    .section-head {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 48px;
+      gap: 64px;
       align-items: end;
       margin-bottom: 64px;
     }
 
-    .how-desc {
-      font-size: 16px;
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
       color: var(--muted);
-      line-height: 1.7;
-      font-weight: 300;
-      max-width: 380px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-label::before {
+      content: '';
+      width: 28px; height: 1px; background: var(--ink);
+    }
+    .section-title {
+      font-family: 'Newsreader', serif;
+      font-weight: 400;
+      font-size: clamp(38px, 4.6vw, 64px);
+      line-height: 1.02;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+    }
+    .section-title em { font-style: italic; color: var(--accent); }
+
+    .section-desc {
+      font-size: 15.5px;
+      line-height: 1.65;
+      color: var(--ink-2);
+      max-width: 440px;
       align-self: end;
     }
 
-    /* PHASE BLOCKS */
-    .phases { display: flex; flex-direction: column; gap: 24px; }
+    /* ─────────────── PHASES ─────────────── */
+    .phases { display: grid; gap: 28px; }
 
     .phase {
-      border: 1px solid var(--border);
-      border-radius: 20px;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      position: relative;
       overflow: hidden;
-      background: #fff;
-      transition: box-shadow 0.2s;
     }
 
-    .phase:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.06); }
-
-    .phase-header {
+    .phase-bar {
       display: flex;
       align-items: center;
+      justify-content: space-between;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--rule);
       gap: 16px;
-      padding: 28px 32px 24px;
-      border-bottom: 1px solid var(--border);
+      background: color-mix(in oklab, var(--paper) 60%, var(--bg));
     }
+    .phase-left { display: flex; align-items: center; gap: 18px; }
 
-    .phase-pill {
+    .phase-num {
+      font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      padding: 5px 12px;
-      border-radius: 100px;
-      white-space: nowrap;
+      letter-spacing: 0.16em;
+      color: var(--muted);
     }
-
-    .phase-pill.live { background: #dcfce7; color: #166534; }
-    .phase-pill.future { background: #f3f4f6; color: #6b7280; }
+    .phase-num b { color: var(--ink); font-weight: 500; }
 
     .phase-title {
-      font-family: 'Instrument Serif', serif;
+      font-family: 'Newsreader', serif;
       font-size: 22px;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.015em;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 5px 11px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .pill.live {
+      background: var(--signal);
+      color: var(--signal-ink);
+    }
+    .pill.live .d { width: 5px; height: 5px; border-radius: 50%; background: var(--signal-ink); animation: tinypulse 1.6s infinite; }
+    @keyframes tinypulse {
+      0%,100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+    .pill.future {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--rule-strong);
     }
 
     .phase-body {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 3fr 2fr;
     }
-
     .phase-steps {
-      padding: 32px 32px;
-      display: flex;
-      flex-direction: column;
-      gap: 28px;
-      border-right: 1px solid var(--border);
+      padding: 36px 32px;
+      display: grid;
+      gap: 30px;
+      border-right: 1px solid var(--rule);
+      position: relative;
     }
-
     .phase-step {
-      display: flex;
-      gap: 16px;
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 18px;
       align-items: flex-start;
     }
-
-    .phase-step-icon {
-      width: 34px;
-      height: 34px;
-      background: var(--green-pale);
-      border-radius: 9px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
+    .step-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      padding-top: 4px;
+      border-top: 1px solid var(--ink);
+      display: inline-block;
+      width: 40px;
     }
-
-    .phase-step-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
-    .phase-step-desc { font-size: 13px; color: var(--muted); line-height: 1.6; font-weight: 300; }
+    .step-num b { color: var(--ink); font-weight: 500; }
+    .step-title { font-size: 15px; font-weight: 500; color: var(--ink); margin-bottom: 6px; letter-spacing: -0.005em; }
+    .step-desc { font-size: 13.5px; line-height: 1.6; color: var(--ink-2); font-weight: 400; }
 
     .phase-detail {
-      padding: 32px 32px;
-      background: var(--green-pale);
+      padding: 36px 32px;
+      background: var(--bg);
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: space-between;
+      gap: 24px;
+      position: relative;
     }
-
+    .phase-detail::before {
+      content: '';
+      position: absolute;
+      top: 24px; bottom: 24px; left: 0;
+      width: 1px;
+      background:
+        repeating-linear-gradient(to bottom, var(--rule-strong) 0 4px, transparent 4px 8px);
+    }
     .phase-detail-label {
+      font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 1.5px;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
-      color: #5a7a64;
-      margin-bottom: 12px;
+      color: var(--muted);
     }
-
     .phase-note {
-      font-size: 13px;
-      color: var(--muted-dark);
-      line-height: 1.7;
-      font-weight: 300;
+      font-family: 'Newsreader', serif;
+      font-style: italic;
+      font-size: 19px;
+      line-height: 1.4;
+      color: var(--ink);
+      letter-spacing: -0.005em;
     }
-
-    .phase-note strong { color: var(--text); font-weight: 500; }
-
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--green-pale-dark);
-      color: #2d6a4f;
+    .phase-note .key {
+      font-style: normal;
+      background: var(--signal);
+      color: var(--signal-ink);
+      padding: 0 4px;
+    }
+    .phase-foot {
+      font-family: 'JetBrains Mono', monospace;
       font-size: 11px;
-      font-weight: 500;
-      padding: 5px 12px;
-      border-radius: 100px;
-      margin-top: 20px;
+      letter-spacing: 0.06em;
+      color: var(--ink-2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .phase-foot .d {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--signal);
+      box-shadow: 0 0 0 0 color-mix(in oklab, var(--signal) 70%, transparent);
+      animation: pulse 2.2s infinite;
+    }
+    .phase[data-status="future"] .phase-foot .d {
+      background: var(--muted);
+      animation: none;
     }
 
-    /* FOR WHO */
-    .for-who { border-top: 1px solid var(--border); }
+    /* ─────────────── AUDIENCE ─────────────── */
+    .who { border-top: 1px solid var(--rule); }
+    .who-tabs {
+      display: inline-flex;
+      gap: 4px;
+      padding: 4px;
+      background: var(--paper);
+      border: 1px solid var(--rule);
+      border-radius: 999px;
+      margin-bottom: 28px;
+    }
+    .who-tab {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      border-radius: 999px;
+      cursor: pointer;
+      color: var(--muted);
+      transition: color .2s, background .2s;
+      border: none;
+      background: transparent;
+    }
+    .who-tab[data-active="true"] {
+      background: var(--ink);
+      color: var(--bg);
+    }
+    .who-tab:hover:not([data-active="true"]) { color: var(--ink); }
 
-    .audience-grid {
+    .who-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 24px;
-      margin-top: 48px;
     }
-
-    .audience-card {
-      padding: 32px 28px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      background: #fff;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .audience-card:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0,0,0,0.06); }
-
-    .audience-card:first-child {
-      background: var(--green);
-      border-color: var(--green);
-      color: #fff;
-    }
-
-    .audience-card:first-child .audience-desc { color: rgba(255,255,255,0.7); }
-    .audience-card:first-child .audience-title { color: #fff; }
-
-    .audience-icon { margin-bottom: 16px; }
-    .audience-title { font-size: 16px; font-weight: 500; margin-bottom: 8px; color: var(--text); }
-    .audience-desc { font-size: 14px; color: var(--muted); line-height: 1.6; font-weight: 300; }
-
-    /* CONTACT */
-    .contact {
-      border-top: 1px solid var(--green-pale-border);
-      background: var(--green-pale);
-      text-align: center;
-      padding: 96px 72px;
-    }
-
-    .contact .section-title { margin: 0 auto 16px; }
-    .contact-sub { font-size: 16px; color: var(--muted-dark); font-weight: 300; margin-bottom: 40px; }
-
-    .contact-form {
+    .who-card {
+      border: 1px solid var(--rule);
+      border-radius: 4px;
+      padding: 32px;
+      background: var(--paper);
       display: flex;
-      gap: 12px;
-      max-width: 420px;
+      flex-direction: column;
+      gap: 18px;
+      min-height: 320px;
+      position: relative;
+      transition: transform .25s ease, box-shadow .25s ease, border-color .25s, background .25s;
+      cursor: default;
+    }
+    .who-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 40px -25px rgba(14,17,22,0.4);
+      border-color: var(--ink);
+    }
+    .who-card[data-featured="true"] {
+      background: var(--ink);
+      border-color: var(--ink);
+      color: var(--bg);
+    }
+    .who-card[data-featured="true"] .who-desc { color: rgba(241,236,224,0.74); }
+    html[data-palette="midnight"] .who-card[data-featured="true"] { background: var(--accent); color: var(--signal-ink); border-color: var(--accent); }
+    html[data-palette="midnight"] .who-card[data-featured="true"] .who-desc { color: rgba(11,14,20,0.7); }
+
+    .who-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+    }
+    .who-card[data-featured="true"] .who-num { color: color-mix(in oklab, var(--bg) 60%, transparent); }
+    .who-card[data-featured="true"] .who-num b { color: var(--signal); }
+
+    .who-title {
+      font-family: 'Newsreader', serif;
+      font-size: 32px;
+      letter-spacing: -0.025em;
+      line-height: 1;
+    }
+    .who-desc { font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
+    .who-card[data-featured="true"] .who-desc { /* set above */ }
+
+    .who-foot {
+      margin-top: auto;
+      padding-top: 16px;
+      border-top: 1px solid var(--rule);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .who-card[data-featured="true"] .who-foot { border-color: rgba(241,236,224,0.18); }
+    .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 9px;
+      border: 1px solid var(--rule-strong);
+      border-radius: 999px;
+      color: var(--ink-2);
+    }
+    .who-card[data-featured="true"] .tag { border-color: rgba(241,236,224,0.22); color: rgba(241,236,224,0.85); }
+
+    /* ─────────────── CONTACT ─────────────── */
+    .contact {
+      border-top: 1px solid var(--rule);
+      background: var(--paper);
+    }
+    .contact-inner {
+      max-width: 1280px;
       margin: 0 auto;
+      padding: 120px 40px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 80px;
+      align-items: center;
     }
-
-    input[type="email"] {
-      flex: 1;
-      padding: 14px 18px;
-      border: 1px solid var(--green-pale-border);
-      border-radius: 10px;
+    .contact-card {
+      background: var(--bg);
+      border: 1px solid var(--rule-strong);
+      border-radius: 4px;
+      padding: 36px;
+      position: relative;
+    }
+    .contact-card::before {
+      content: 'OPEN VOOR PARTNERS';
+      position: absolute;
+      top: -10px; left: 24px;
+      background: var(--bg);
+      padding: 0 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+    }
+    .contact-form { display: flex; flex-direction: column; gap: 14px; margin-top: 8px; }
+    .contact-form label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .contact-form input {
+      padding: 14px 16px;
+      border: 1px solid var(--rule-strong);
+      background: var(--paper);
+      border-radius: 2px;
+      font-family: 'Geist', sans-serif;
       font-size: 15px;
-      font-family: 'DM Sans', sans-serif;
-      background: #fff;
-      color: var(--text);
+      color: var(--ink);
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color .2s;
     }
-
-    input[type="email"]:focus { border-color: var(--green); }
-    input[type="email"]::placeholder { color: var(--muted); }
-
-    button[type="submit"] {
-      background: var(--green);
-      color: #fff;
-      border: none;
-      padding: 14px 24px;
-      border-radius: 10px;
-      font-size: 15px;
+    .contact-form input:focus { border-color: var(--ink); }
+    .contact-form button {
+      margin-top: 6px;
+      padding: 14px 22px;
+      background: var(--ink);
+      color: var(--bg);
+      border: 1px solid var(--ink);
+      border-radius: 999px;
+      font-family: 'Geist', sans-serif;
+      font-size: 14.5px;
       font-weight: 500;
-      font-family: 'DM Sans', sans-serif;
       cursor: pointer;
-      transition: background 0.2s;
-      white-space: nowrap;
+      transition: background .2s, color .2s;
     }
+    .contact-form button:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+    html[data-palette="midnight"] .contact-form button:hover { color: var(--signal-ink); }
+    .contact-note {
+      margin-top: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+    .contact-note a { color: var(--accent); border-bottom: 1px solid var(--rule-strong); }
 
-    button[type="submit"]:hover { background: var(--green-mid); }
-    .contact-note { margin-top: 16px; font-size: 12px; color: var(--muted); }
-
-    /* FOOTER */
+    /* ─────────────── FOOTER ─────────────── */
     footer {
-      border-top: 1px solid var(--green-pale-border);
-      padding: 32px 72px;
+      border-top: 1px solid var(--rule);
+      padding: 28px 40px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: var(--green-pale);
+      gap: 16px;
+      background: var(--bg);
+      flex-wrap: wrap;
     }
-
-    .footer-logo { font-family: 'Instrument Serif', serif; font-size: 18px; color: var(--green); }
-    .footer-logo span { font-style: italic; }
-    .footer-copy { font-size: 13px; color: var(--muted); }
-
-    /* ANIMATIONS */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+    .footer-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: flex; gap: 18px; flex-wrap: wrap;
     }
+    .footer-meta b { color: var(--ink); font-weight: 500; }
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.4); opacity: 0.6; }
+    /* ─────────────── TWEAKS PANEL ─────────────── */
+    .tweaks {
+      position: fixed;
+      right: 20px; bottom: 20px;
+      z-index: 200;
+      background: var(--paper);
+      border: 1px solid var(--rule-strong);
+      border-radius: 8px;
+      padding: 16px;
+      width: 240px;
+      box-shadow: 0 20px 40px -20px rgba(0,0,0,0.25);
+      display: none;
+      font-family: 'Geist', sans-serif;
     }
-
-    .reveal {
-      opacity: 0;
-      transform: translateY(24px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
+    .tweaks.open { display: block; }
+    .tweaks-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
     }
+    .tweaks-head .t {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .tweaks-head button {
+      background: transparent; border: none; cursor: pointer;
+      color: var(--muted); font-size: 18px; line-height: 1; padding: 0;
+    }
+    .tweaks-row { margin-bottom: 14px; }
+    .tweaks-row > .lbl {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .tweaks-swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .swatch {
+      aspect-ratio: 1;
+      border-radius: 6px;
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, var(--a) 50%, var(--b) 50%);
+    }
+    .swatch[data-active="true"] { border-color: var(--ink); }
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; }
+    .toggle-row .lbl { font-size: 12.5px; color: var(--ink); }
+    .toggle {
+      width: 36px; height: 20px; border-radius: 999px;
+      background: var(--rule-strong);
+      position: relative; cursor: pointer;
+      transition: background .2s;
+      border: none;
+    }
+    .toggle::after {
+      content: '';
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 16px; height: 16px;
+      background: var(--paper);
+      border-radius: 50%;
+      transition: transform .2s;
+    }
+    .toggle[data-on="true"] { background: var(--ink); }
+    .toggle[data-on="true"]::after { transform: translateX(16px); }
 
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    /* RESPONSIVE */
-    @media (max-width: 768px) {
-      nav { padding: 16px 24px; }
-      .nav-links { gap: 16px; }
-      .hero-inner { flex-direction: column; padding: 100px 24px 60px; gap: 40px; }
-      .hero-text { max-width: 100%; }
-      .hero-visual { width: 100%; display: flex; justify-content: center; }
-      section { padding: 64px 24px; }
-      .how-intro { grid-template-columns: 1fr; gap: 24px; }
+    /* ─────────────── RESPONSIVE ─────────────── */
+    @media (max-width: 900px) {
+      .hero { padding: 56px 24px 72px; }
+      .hero-grid { grid-template-columns: 1fr; gap: 48px; }
+      .receipt-stage { justify-content: flex-start; }
+      .band-inner { grid-template-columns: 1fr 1fr; padding: 22px 24px; gap: 24px; }
+      .band-lede { grid-column: 1 / -1; }
+      section { padding: 72px 24px; }
+      .section-head { grid-template-columns: 1fr; gap: 20px; }
       .phase-body { grid-template-columns: 1fr; }
-      .phase-steps { border-right: none; border-bottom: 1px solid var(--border); }
-      .phase-header { flex-wrap: wrap; }
-      .audience-grid { grid-template-columns: 1fr; }
-      .contact { padding: 64px 24px; }
-      .contact-form { flex-direction: column; }
-      footer { padding: 24px; flex-direction: column; gap: 12px; text-align: center; }
+      .phase-steps { border-right: none; border-bottom: 1px solid var(--rule); }
+      .phase-detail::before { display: none; }
+      .who-grid { grid-template-columns: 1fr; }
+      .contact-inner { grid-template-columns: 1fr; gap: 40px; padding: 72px 24px; }
+      nav.top { padding: 14px 20px; }
+      .nav-meta { display: none; }
+      .nav-links { gap: 16px; }
+      .hero-meta { grid-template-columns: 1fr 1fr; }
+      .hero-meta > div { padding: 10px 0; }
+      .hero-meta > div + div { border-left: none; padding-left: 0; }
+      .hero-meta > div:nth-child(2) { border-left: 1px solid var(--rule); padding-left: 18px; }
     }
+
+    /* reveal */
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav>
-    <div class="logo">Bill<span>-e</span></div>
-    <div class="nav-links">
-      <a href="#hoe-werkt-het">Hoe het werkt</a>
-      <a href="#voor-wie">Voor wie</a>
-      <a href="#contact" class="btn-nav">Contact</a>
-    </div>
-  </nav>
-
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-inner">
-    <div class="hero-text">
-      <div class="hero-tag">Nu actief in Apeldoorn — Fase 1</div>
-      <h1>Jouw bon, <em>automatisch</em> digitaal</h1>
-      <p class="hero-sub">Bill-e koppelt kassabonnen automatisch aan betalingen. Geen papier. Geen scannen. Altijd inzicht — voor consumenten én bedrijven.</p>
-      <div class="hero-cta">
-        <a href="#contact" class="btn-primary">Blijf op de hoogte</a>
-        <a href="#hoe-werkt-het" class="btn-secondary">Hoe het werkt →</a>
-      </div>
-    </div>
-
-    <div class="hero-visual">
-      <div class="receipt-card">
-        <div class="pulse-dot"></div>
-        <div class="receipt-header">
-          <div class="receipt-merchant">Koe</div>
-          <div class="receipt-badge">✓ Live</div>
-        </div>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Dorpsstraat 1, Apeldoorn</div>
-        <div class="receipt-divider"></div>
-        <div class="receipt-item">
-          <span class="receipt-item-name">Cappuccino</span>
-          <span class="receipt-item-price">€ 3,50</span>
-        </div>
-        <div class="receipt-item">
-          <span class="receipt-item-name">Croissant</span>
-          <span class="receipt-item-price">€ 2,75</span>
-        </div>
-        <div class="receipt-item">
-          <span class="receipt-item-name">Appeltaart × 2</span>
-          <span class="receipt-item-price">€ 9,00</span>
-        </div>
-        <div class="receipt-item">
-          <span class="receipt-item-name">Jus d'orange</span>
-          <span class="receipt-item-price">€ 3,25</span>
-        </div>
-        <div class="receipt-total">
-          <span>Totaal</span>
-          <span>€ 18,50</span>
-        </div>
-        <div class="receipt-meta">BTW 9% — € 1,53 &nbsp;·&nbsp; 20 mei 2026</div>
-      </div>
-    </div>
+  <!-- ─── TICKER ─── -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track" id="ticker-track">
+      <!-- Filled by JS — duplicated for seamless loop -->
     </div>
   </div>
 
-  <!-- HOW IT WORKS -->
+  <!-- ─── NAV ─── -->
+  <nav class="top">
+    <a href="#top" class="logo">Bill<span class="dash">-</span><span class="e">e</span></a>
+    <div class="nav-meta">
+      <span class="pulse"></span>
+      <span>Live · Apeldoorn · Fase 1</span>
+    </div>
+    <div class="nav-links">
+      <a href="#hoe-werkt-het">Hoe het werkt</a>
+      <a href="#voor-wie">Voor wie</a>
+      <a href="#contact" class="nav-cta">Contact</a>
+    </div>
+  </nav>
+
+  <!-- ─── HERO ─── -->
+  <header class="hero" id="top">
+    <div class="hero-grid">
+      <div class="hero-text">
+        <div class="eyebrow">
+          <span class="bar"></span>
+          <span>Fase 01 · <b>Nu actief in Apeldoorn</b></span>
+        </div>
+        <h1 class="display">
+          Jouw&nbsp;bon,<br>
+          <em>automatisch</em><br>
+          digitaal.
+        </h1>
+        <p class="hero-sub">
+          Bill-e koppelt kassabonnen automatisch aan betalingen.
+          Geen papier. Geen scannen. Altijd inzicht —
+          voor consumenten én bedrijven.
+        </p>
+        <div class="hero-cta">
+          <a href="#contact" class="btn btn-primary">Blijf op de hoogte →</a>
+          <a href="#hoe-werkt-het" class="btn btn-ghost">Hoe het werkt</a>
+        </div>
+        <div class="hero-meta">
+          <div>
+            <span class="k">Status</span>
+            <span class="v">Operationeel</span>
+          </div>
+          <div>
+            <span class="k">Locatie</span>
+            <span class="v">Apeldoorn, NL</span>
+          </div>
+          <div>
+            <span class="k">Partner #01</span>
+            <span class="v">Koe</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="receipt-stage">
+        <div class="stamp">
+          <span>FASE</span>
+          <b>01</b>
+          <span>Live · ’26</span>
+        </div>
+        <div class="receipt" role="img" aria-label="Voorbeeld digitale bon van Koe in Apeldoorn">
+          <div class="receipt-head">
+            <div>
+              <div class="receipt-merchant">Koe</div>
+              <div class="receipt-addr">Dorpsstraat 1 · Otterlo</div>
+            </div>
+            <span class="receipt-live"><span class="d"></span> Live</span>
+          </div>
+
+          <div class="receipt-rule"></div>
+
+          <div class="r-line"><span class="name">Cappuccino</span><span class="price">€ 3,50</span></div>
+          <div class="r-line"><span class="name">Croissant</span><span class="price">€ 2,75</span></div>
+          <div class="r-line"><span class="name">Appeltaart × 2</span><span class="price">€ 9,00</span></div>
+          <div class="r-line"><span class="name">Jus d'orange</span><span class="price">€ 3,25</span></div>
+
+          <div class="r-total"><span>Totaal</span><span class="price">€ 18,50</span></div>
+
+          <div class="r-meta">
+            <span>BTW 9% · € 1,53</span>
+            <span>20 / 05 / 26</span>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── STATS BAND ─── -->
+  <div class="band">
+    <div class="band-inner">
+      <div class="band-lede">
+        Een bon hoort bij <em>jouw</em> betaling. Bill-e regelt de rest — automatisch.
+      </div>
+      <div class="band-stat">
+        <div class="num">01</div>
+        <div class="lbl">Partner-locatie · Apeldoorn</div>
+      </div>
+      <div class="band-stat">
+        <div class="num">0%</div>
+        <div class="lbl">Papier · scannen · gedoe</div>
+      </div>
+      <div class="band-stat">
+        <div class="num">2</div>
+        <div class="lbl">Fasen · één visie</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── HOE WERKT HET ─── -->
   <section class="how" id="hoe-werkt-het">
-    <div class="how-intro">
+    <div class="section-head">
       <div>
         <div class="section-label reveal">Hoe het werkt</div>
-        <h2 class="section-title reveal">Twee fasen, <em>één visie</em></h2>
+        <h2 class="section-title reveal">Twee fasen,<br><em>één visie.</em></h2>
       </div>
-      <p class="how-desc reveal">We bouwen stapsgewijs. Fase 1 is vandaag al operationeel bij onze eerste partner in Apeldoorn. Fase 2 brengt volledige automatisering — zonder extra hardware.</p>
+      <p class="section-desc reveal">
+        We bouwen stapsgewijs. Fase 1 is vandaag al operationeel bij onze eerste partner in Apeldoorn.
+        Fase 2 brengt volledige automatisering — zonder extra hardware.
+      </p>
     </div>
 
     <div class="phases">
 
       <!-- PHASE 1 -->
-      <div class="phase reveal">
-        <div class="phase-header">
-          <div class="phase-pill live">● Nu live</div>
-          <div class="phase-title">Fase 1 — De bon wordt digitaal</div>
+      <div class="phase reveal" data-status="live">
+        <div class="phase-bar">
+          <div class="phase-left">
+            <div class="phase-num">FASE <b>01</b></div>
+            <div class="phase-title">De bon wordt digitaal</div>
+          </div>
+          <div class="pill live"><span class="d"></span> Nu live</div>
         </div>
         <div class="phase-body">
           <div class="phase-steps">
             <div class="phase-step">
-              <div class="phase-step-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0f5238" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M7 7h10M7 11h6"/>
-                </svg>
-              </div>
-              <div class="phase-step-text">
-                <div class="phase-step-title">Klant betaalt bij de kassa</div>
-                <div class="phase-step-desc">De klant betaalt zoals gewoonlijk. Er verandert niets aan het kassaproces — de bon print gewoon door.</div>
+              <span class="step-num">STAP <b>01</b></span>
+              <div>
+                <div class="step-title">Klant betaalt bij de kassa</div>
+                <div class="step-desc">De klant betaalt zoals gewoonlijk. Er verandert niets aan het kassaproces — de bon print gewoon door.</div>
               </div>
             </div>
             <div class="phase-step">
-              <div class="phase-step-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0f5238" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
-                </svg>
-              </div>
-              <div class="phase-step-text">
-                <div class="phase-step-title">Bill-e legt de bon vast</div>
-                <div class="phase-step-desc">Op het moment van afdrukken legt Bill-e alle artikelen, bedragen en BTW vast en slaat dit veilig op in de cloud.</div>
+              <span class="step-num">STAP <b>02</b></span>
+              <div>
+                <div class="step-title">Bill-e legt de bon vast</div>
+                <div class="step-desc">Op het moment van afdrukken legt Bill-e alle artikelen, bedragen en BTW vast en slaat dit veilig op in de cloud.</div>
               </div>
             </div>
             <div class="phase-step">
-              <div class="phase-step-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0f5238" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="5" y="2" width="14" height="20" rx="2"/><path d="M9 7h6M9 11h6M9 15h4"/>
-                </svg>
-              </div>
-              <div class="phase-step-text">
-                <div class="phase-step-title">Klant opent de digitale bon</div>
-                <div class="phase-step-desc">Via een unieke link ziet de klant direct zijn volledige digitale bon. Geen app, geen account nodig.</div>
+              <span class="step-num">STAP <b>03</b></span>
+              <div>
+                <div class="step-title">Klant opent de digitale bon</div>
+                <div class="step-desc">Via een unieke link ziet de klant direct zijn volledige digitale bon. Geen app, geen account nodig.</div>
               </div>
             </div>
           </div>
           <div class="phase-detail">
-            <div class="phase-detail-label">Status</div>
-            <div class="phase-note"><strong>Nu operationeel bij Koe, Apeldoorn.</strong> Eerste echte transacties worden binnenkort live getest samen met onze eerste gebruikers.</div>
-            <div class="status-badge">● Fase 1 actief</div>
+            <div>
+              <div class="phase-detail-label">Veldnotitie · Apeldoorn</div>
+              <p class="phase-note">
+                <span class="key">Nu operationeel</span> bij Koe in Otterlo. Eerste echte transacties worden binnenkort live getest samen met onze eerste gebruikers.
+              </p>
+            </div>
+            <div class="phase-foot">
+              <span class="d"></span>
+              <span>FASE 01 · ACTIEF · ’26</span>
+            </div>
           </div>
         </div>
       </div>
 
       <!-- PHASE 2 -->
-      <div class="phase reveal">
-        <div class="phase-header">
-          <div class="phase-pill future">Roadmap</div>
-          <div class="phase-title">Fase 2 — Automatisch via je bank</div>
+      <div class="phase reveal" data-status="future">
+        <div class="phase-bar">
+          <div class="phase-left">
+            <div class="phase-num">FASE <b>02</b></div>
+            <div class="phase-title">Automatisch via je bank</div>
+          </div>
+          <div class="pill future">Roadmap</div>
         </div>
         <div class="phase-body">
           <div class="phase-steps">
             <div class="phase-step">
-              <div class="phase-step-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0f5238" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>
-                </svg>
-              </div>
-              <div class="phase-step-text">
-                <div class="phase-step-title">Klant koppelt zijn bankrekening eenmalig</div>
-                <div class="phase-step-desc">Via een veilige bankkoppeling herkent Bill-e automatisch welke betalingen je hebt gedaan — bij welke winkels, op welk moment.</div>
+              <span class="step-num">STAP <b>01</b></span>
+              <div>
+                <div class="step-title">Klant koppelt zijn bankrekening eenmalig</div>
+                <div class="step-desc">Via een veilige bankkoppeling herkent Bill-e automatisch welke betalingen je hebt gedaan — bij welke winkels, op welk moment.</div>
               </div>
             </div>
             <div class="phase-step">
-              <div class="phase-step-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0f5238" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="8" cy="12" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="18" cy="18" r="3"/>
-                  <path d="M10.5 10.5l5-3M10.5 13.5l5 3"/>
-                </svg>
-              </div>
-              <div class="phase-step-text">
-                <div class="phase-step-title">Retailer deelt de bongegevens</div>
-                <div class="phase-step-desc">Aangesloten winkels sturen automatisch de bijbehorende bondata — zonder dat de klant iets hoeft te doen bij de kassa.</div>
+              <span class="step-num">STAP <b>02</b></span>
+              <div>
+                <div class="step-title">Retailer deelt de bongegevens</div>
+                <div class="step-desc">Aangesloten winkels sturen automatisch de bijbehorende bondata — zonder dat de klant iets hoeft te doen bij de kassa.</div>
               </div>
             </div>
             <div class="phase-step">
-              <div class="phase-step-icon">
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#0f5238" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M20 6L9 17l-5-5"/>
-                </svg>
-              </div>
-              <div class="phase-step-text">
-                <div class="phase-step-title">Alles staat automatisch klaar</div>
-                <div class="phase-step-desc">Consumenten zien al hun bonnen op één plek. ZZP'ers en MKB hebben hun administratie direct op orde.</div>
+              <span class="step-num">STAP <b>03</b></span>
+              <div>
+                <div class="step-title">Alles staat automatisch klaar</div>
+                <div class="step-desc">Consumenten zien al hun bonnen op één plek. ZZP'ers en MKB hebben hun administratie direct op orde.</div>
               </div>
             </div>
           </div>
           <div class="phase-detail">
-            <div class="phase-detail-label">Waarom dit werkt</div>
-            <div class="phase-note">Fase 1 bewijst dat de behoefte er is en bouwt retailerrelaties op. <strong>Fase 2 is de schaalbare business</strong> — geen hardware, geen installatie, geen gedoe.</div>
+            <div>
+              <div class="phase-detail-label">Waarom dit werkt</div>
+              <p class="phase-note">
+                Fase 01 bewijst dat de behoefte er is. <span class="key">Fase 02 is de schaalbare business</span> — geen hardware, geen installatie, geen gedoe.
+              </p>
+            </div>
+            <div class="phase-foot">
+              <span class="d"></span>
+              <span>FASE 02 · ROADMAP</span>
+            </div>
           </div>
         </div>
       </div>
@@ -743,71 +1273,209 @@
     </div>
   </section>
 
-  <!-- FOR WHO -->
-  <section class="for-who" id="voor-wie">
-    <div class="section-label reveal">Voor wie</div>
-    <h2 class="section-title reveal">Waardevol voor <em>iedereen</em> die betaalt</h2>
+  <!-- ─── VOOR WIE ─── -->
+  <section class="who" id="voor-wie">
+    <div class="section-head">
+      <div>
+        <div class="section-label reveal">Voor wie</div>
+        <h2 class="section-title reveal">Waardevol voor <em>iedereen</em><br>die betaalt.</h2>
+      </div>
+      <p class="section-desc reveal">
+        Drie groepen, één digitale bon. Kies de rol die past — de waarde van Bill-e schaalt met je.
+      </p>
+    </div>
 
-    <div class="audience-grid">
-      <div class="audience-card reveal">
-        <div class="audience-icon">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-          </svg>
+    <div class="who-tabs reveal" role="tablist" id="who-tabs">
+      <button class="who-tab" data-tab="consument" data-active="true">Consumenten</button>
+      <button class="who-tab" data-tab="zzp">ZZP'ers</button>
+      <button class="who-tab" data-tab="mkb">MKB</button>
+    </div>
+
+    <div class="who-grid">
+      <div class="who-card reveal" data-card="consument" data-featured="true">
+        <div class="who-num">PROFIEL · <b>01</b></div>
+        <div class="who-title">Consumenten</div>
+        <div class="who-desc">Automatisch overzicht van al je aankopen. Nooit meer bonnetjes bewaren. Splits uitgaven eenvoudig met anderen.</div>
+        <div class="who-foot">
+          <span class="tag">Overzicht</span>
+          <span class="tag">Splits</span>
+          <span class="tag">Geen app</span>
         </div>
-        <div class="audience-title">Consumenten</div>
-        <div class="audience-desc">Automatisch overzicht van al je aankopen. Nooit meer bonnetjes bewaren. Splits uitgaven eenvoudig met anderen.</div>
       </div>
-      <div class="audience-card reveal">
-        <div class="audience-icon">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f5238" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
-          </svg>
+      <div class="who-card reveal" data-card="zzp">
+        <div class="who-num">PROFIEL · <b>02</b></div>
+        <div class="who-title">ZZP'ers</div>
+        <div class="who-desc">Zakelijke aankopen direct in je boekhouding. BTW automatisch bijgehouden. Klaar voor je aangifte zonder extra werk.</div>
+        <div class="who-foot">
+          <span class="tag">BTW-auto</span>
+          <span class="tag">Boekhouding</span>
+          <span class="tag">Aangifte</span>
         </div>
-        <div class="audience-title">ZZP'ers</div>
-        <div class="audience-desc">Zakelijke aankopen direct in je boekhouding. BTW automatisch bijgehouden. Klaar voor je aangifte zonder extra werk.</div>
       </div>
-      <div class="audience-card reveal">
-        <div class="audience-icon">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0f5238" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/>
-          </svg>
+      <div class="who-card reveal" data-card="mkb">
+        <div class="who-num">PROFIEL · <b>03</b></div>
+        <div class="who-title">MKB</div>
+        <div class="who-desc">Koppeling met Exact en Moneybird. Medewerkers declareren moeiteloos. Minder administratie, meer overzicht.</div>
+        <div class="who-foot">
+          <span class="tag">Exact</span>
+          <span class="tag">Moneybird</span>
+          <span class="tag">Declaraties</span>
         </div>
-        <div class="audience-title">MKB</div>
-        <div class="audience-desc">Koppeling met Exact en Moneybird. Medewerkers declareren moeiteloos. Minder administratie, meer overzicht.</div>
       </div>
     </div>
   </section>
 
-  <!-- CONTACT -->
-  <section class="contact" id="contact">
-    <div class="section-label reveal">Contact</div>
-    <h2 class="section-title reveal">Interesse? <em>Laat het ons weten</em></h2>
-    <p class="contact-sub reveal">We zoeken vroege partners, testlocaties en investeerders in Nederland.</p>
-    <form class="contact-form reveal" action="https://formspree.io/f/xpqnpjal" method="POST">
-      <input type="email" name="email" placeholder="jouw@emailadres.nl" required />
-      <button type="submit">Aanmelden</button>
-    </form>
-    <p class="contact-note reveal">Of mail direct naar <a href="mailto:hello@bill-e.com" style="color:var(--green)">hello@bill-e.com</a></p>
+  <!-- ─── CONTACT ─── -->
+  <section class="contact" id="contact" style="max-width:none;padding:0;">
+    <div class="contact-inner">
+      <div>
+        <div class="section-label reveal">Contact</div>
+        <h2 class="section-title reveal">Interesse? <em>Laat het ons weten.</em></h2>
+        <p class="section-desc reveal" style="margin-top:24px;">
+          We zoeken vroege partners, testlocaties en investeerders in Nederland.
+          Korte berichten lezen we met aandacht.
+        </p>
+        <p class="contact-note">
+          Of mail direct naar <a href="/cdn-cgi/l/email-protection#74161106111a1034161d181859115a171b19"><span class="__cf_email__" data-cfemail="ff9d9a8d9a919bbf9d969393d29ad19c9092">[email&#160;protected]</span></a>
+        </p>
+      </div>
+
+      <form class="contact-card reveal" action="https://formspree.io/f/xpqnpjal" method="POST">
+        <div class="contact-form">
+          <label for="email">E-mailadres</label>
+          <input id="email" type="email" name="email" placeholder="jouw@emailadres.nl" required />
+          <label for="org" style="margin-top:6px;">Organisatie <span style="text-transform:none;letter-spacing:0;">(optioneel)</span></label>
+          <input id="org" type="text" name="organisation" placeholder="Bedrijf of rol" />
+          <button type="submit">Aanmelden →</button>
+        </div>
+      </form>
+    </div>
   </section>
 
-  <!-- FOOTER -->
+  <!-- ─── FOOTER ─── -->
   <footer>
-    <div class="footer-logo">Bill<span>-e</span></div>
-    <div class="footer-copy">© 2026 Bill-e — Apeldoorn, Nederland</div>
+    <a href="#top" class="logo" style="font-size:20px;">Bill<span class="dash">-</span><span class="e">e</span></a>
+    <div class="footer-meta">
+      <span>© 2026 BILL-E</span>
+      <span>APELDOORN · <b>NL</b></span>
+      <span>FASE <b>01</b></span>
+    </div>
   </footer>
 
-  <script>
-    const reveals = document.querySelectorAll('.reveal');
+  <!-- ─── TWEAKS PANEL ─── -->
+  <div class="tweaks" id="tweaks">
+    <div class="tweaks-head">
+      <span class="t">Tweaks</span>
+      <button id="tweaks-close" aria-label="Close">×</button>
+    </div>
+    <div class="tweaks-row">
+      <span class="lbl">Palette</span>
+      <div class="tweaks-swatches" id="palette-swatches">
+        <button class="swatch" data-palette="bone"     style="--a:#F1ECE0;--b:#1F3A2E;" title="Bone & Ink"></button>
+        <button class="swatch" data-palette="forest"   style="--a:#EEF2EA;--b:#0F5238;" title="Forest"></button>
+        <button class="swatch" data-palette="midnight" style="--a:#0B0E14;--b:#C6FF4A;" title="Midnight"></button>
+        <button class="swatch" data-palette="paper"    style="--a:#FAF6EE;--b:#C84A2A;" title="Paper · Coral"></button>
+      </div>
+    </div>
+    <div class="tweaks-row">
+      <div class="toggle-row">
+        <span class="lbl">Live ticker</span>
+        <button class="toggle" id="t-ticker" data-on="true" aria-label="Toggle ticker"></button>
+      </div>
+      <div class="toggle-row">
+        <span class="lbl">Serif headlines</span>
+        <button class="toggle" id="t-serif" data-on="true" aria-label="Toggle serif"></button>
+      </div>
+    </div>
+  </div>
+
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    // ─── Defaults from EDITMODE block ──────────────────────────────
+    const DEFAULTS = JSON.parse(
+      document.getElementById('tweak-defaults').textContent
+        .replace(/\/\*EDITMODE-(BEGIN|END)\*\//g, '')
+    );
+    let state = { ...DEFAULTS };
+
+    function applyState() {
+      document.documentElement.dataset.palette = state.palette;
+      document.documentElement.dataset.ticker  = state.ticker ? 'on' : 'off';
+      document.documentElement.dataset.serif   = state.serifHeadline ? 'on' : 'off';
+      // Update swatches + toggles
+      document.querySelectorAll('#palette-swatches .swatch').forEach(s => {
+        s.dataset.active = String(s.dataset.palette === state.palette);
+      });
+      document.getElementById('t-ticker').dataset.on = String(!!state.ticker);
+      document.getElementById('t-serif').dataset.on  = String(!!state.serifHeadline);
+    }
+    applyState();
+
+    function setKey(patch) {
+      state = { ...state, ...patch };
+      applyState();
+      try {
+        window.parent.postMessage({ type: '__edit_mode_set_keys', edits: patch }, '*');
+      } catch(e) {}
+    }
+
+    // ─── Tweaks panel host protocol ─────────────────────────────────
+    const panel = document.getElementById('tweaks');
+    window.addEventListener('message', (e) => {
+      const d = e.data || {};
+      if (d.type === '__activate_edit_mode') panel.classList.add('open');
+      if (d.type === '__deactivate_edit_mode') panel.classList.remove('open');
+    });
+    document.getElementById('tweaks-close').addEventListener('click', () => {
+      panel.classList.remove('open');
+      try { window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*'); } catch(e) {}
+    });
+    try { window.parent.postMessage({ type: '__edit_mode_available' }, '*'); } catch(e) {}
+
+    // Wire palette swatches
+    document.querySelectorAll('#palette-swatches .swatch').forEach(s => {
+      s.addEventListener('click', () => setKey({ palette: s.dataset.palette }));
+    });
+    document.getElementById('t-ticker').addEventListener('click', () => setKey({ ticker: !state.ticker }));
+    document.getElementById('t-serif').addEventListener('click', () => setKey({ serifHeadline: !state.serifHeadline }));
+
+    // ─── Ticker content ─────────────────────────────────────────────
+    const tickerItems = [
+      ['Bill-e · Fase 01', 'live in Apeldoorn'],
+      ['Partner #01', 'Koe · Otterlo'],
+      ['Demo-bon', '€ 18,50 · 20·05·26'],
+      ['BTW', 'automatisch bijgehouden'],
+      ['Geen app · geen account', 'unieke link'],
+      ['Fase 02', 'roadmap · bankkoppeling'],
+      ['Status', 'operationeel'],
+      ['Open voor partners', 'berend@bill-e.com'],
+    ];
+    const track = document.getElementById('ticker-track');
+    const buildItems = () => tickerItems.map(([a, b]) =>
+      `<span class="ticker-item"><span class="dot"></span><b>${a}</b> · ${b}</span>`
+    ).join('');
+    track.innerHTML = buildItems() + buildItems();
+
+    // ─── Audience tabs (focus the selected card as featured) ─────────
+    const tabs = document.querySelectorAll('#who-tabs .who-tab');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.dataset.active = String(t === tab));
+        document.querySelectorAll('.who-card').forEach(c => {
+          c.dataset.featured = String(c.dataset.card === tab.dataset.tab);
+        });
+      });
+    });
+
+    // ─── Reveal on scroll ────────────────────────────────────────────
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry, i) => {
         if (entry.isIntersecting) {
-          setTimeout(() => entry.target.classList.add('visible'), i * 80);
+          setTimeout(() => entry.target.classList.add('visible'), i * 70);
           observer.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.1 });
-    reveals.forEach(el => observer.observe(el));
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
   </script>
 </body>
 </html>
