@@ -805,19 +805,27 @@
       transition: transform .25s ease, box-shadow .25s ease, border-color .25s, background .25s;
       cursor: default;
     }
-    .who-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 18px 40px -25px rgba(14,17,22,0.4);
-      border-color: var(--ink);
+    @media (hover: hover) {
+      .who-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 18px 40px -25px rgba(14,17,22,0.4);
+        background: var(--ink);
+        border-color: var(--ink);
+        color: var(--bg);
+      }
+      .who-card:hover .who-desc { color: rgba(241,236,224,0.74); }
+      .who-card:hover .who-num { color: color-mix(in oklab, var(--bg) 60%, transparent); }
+      .who-card:hover .who-num b { color: var(--signal); }
+      .who-card:hover .who-foot { border-color: rgba(241,236,224,0.18); }
+      .who-card:hover .who-title {
+        background: var(--signal);
+        color: var(--signal-ink);
+        box-shadow: 6px 0 0 var(--signal), -6px 0 0 var(--signal);
+      }
+      .who-card:hover .tag { border-color: rgba(241,236,224,0.22); color: rgba(241,236,224,0.85); }
+      html[data-palette="midnight"] .who-card:hover { background: var(--accent); color: var(--signal-ink); border-color: var(--accent); }
+      html[data-palette="midnight"] .who-card:hover .who-desc { color: rgba(11,14,20,0.7); }
     }
-    .who-card[data-featured="true"] {
-      background: var(--ink);
-      border-color: var(--ink);
-      color: var(--bg);
-    }
-    .who-card[data-featured="true"] .who-desc { color: rgba(241,236,224,0.74); }
-    html[data-palette="midnight"] .who-card[data-featured="true"] { background: var(--accent); color: var(--signal-ink); border-color: var(--accent); }
-    html[data-palette="midnight"] .who-card[data-featured="true"] .who-desc { color: rgba(11,14,20,0.7); }
 
     .who-num {
       font-family: 'JetBrains Mono', monospace;
@@ -825,14 +833,15 @@
       letter-spacing: 0.16em;
       color: var(--muted);
     }
-    .who-card[data-featured="true"] .who-num { color: color-mix(in oklab, var(--bg) 60%, transparent); }
-    .who-card[data-featured="true"] .who-num b { color: var(--signal); }
+
 
     .who-title {
       font-family: 'Newsreader', serif;
       font-size: 32px;
       letter-spacing: -0.025em;
       line-height: 1;
+      align-self: flex-start;
+      transition: background .25s ease, color .25s ease, box-shadow .25s ease;
     }
     .who-desc { font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
     .who-card[data-featured="true"] .who-desc { /* set above */ }
@@ -845,7 +854,7 @@
       flex-wrap: wrap;
       gap: 6px;
     }
-    .who-card[data-featured="true"] .who-foot { border-color: rgba(241,236,224,0.18); }
+
     .tag {
       font-family: 'JetBrains Mono', monospace;
       font-size: 10px;
@@ -856,7 +865,7 @@
       border-radius: 999px;
       color: var(--ink-2);
     }
-    .who-card[data-featured="true"] .tag { border-color: rgba(241,236,224,0.22); color: rgba(241,236,224,0.85); }
+
 
     /* ─────────────── CONTACT ─────────────── */
     .contact {
@@ -1048,15 +1057,7 @@
       .phase-body { grid-template-columns: 1fr; }
       .phase-steps { border-right: none; border-bottom: 1px solid var(--rule); }
       .phase-detail::before { display: none; }
-      .who-grid { overflow: hidden; }
-      .who-grid-track {
-        display: flex;
-        gap: 0;
-        width: 100%;
-        transform: translateX(calc(var(--slide, 0) * -100%));
-        transition: transform .45s cubic-bezier(.5,.1,.1,1);
-      }
-      .who-grid-track > .who-card { flex: 0 0 100%; min-width: 0; }
+      .who-grid-track { grid-template-columns: 1fr; }
       .contact-inner { grid-template-columns: 1fr; gap: 40px; padding: 72px 24px; }
       nav.top { padding: 14px 20px; }
       .nav-meta { display: none; }
@@ -1089,6 +1090,7 @@
       <span>Live · Apeldoorn · Fase 1</span>
     </div>
     <div class="nav-links">
+      <a href="#top">Home</a>
       <a href="#hoe-werkt-het">Hoe het werkt</a>
       <a href="#voor-wie">Voor wie</a>
       <a href="#contact" class="nav-cta">Contact</a>
@@ -1315,15 +1317,9 @@
       </p>
     </div>
 
-    <div class="who-tabs reveal" role="tablist" id="who-tabs">
-      <button class="who-tab" data-tab="consument" data-active="true">Consumenten</button>
-      <button class="who-tab" data-tab="zzp">ZZP'ers</button>
-      <button class="who-tab" data-tab="mkb">MKB</button>
-    </div>
-
     <div class="who-grid">
       <div class="who-grid-track" id="who-grid-track">
-      <div class="who-card reveal" data-card="consument" data-featured="true">
+      <div class="who-card reveal" data-card="consument">
         <div class="who-num">PROFIEL · <b>01</b></div>
         <div class="who-title">Consumenten</div>
         <div class="who-desc">Automatisch overzicht van al je aankopen. Nooit meer bonnetjes bewaren. Splits uitgaven eenvoudig met anderen.</div>
@@ -1338,7 +1334,7 @@
         <div class="who-title">ZZP'ers</div>
         <div class="who-desc">Zakelijke aankopen direct in je boekhouding. BTW automatisch bijgehouden. Klaar voor je aangifte zonder extra werk.</div>
         <div class="who-foot">
-          <span class="tag">BTW-auto</span>
+          <span class="tag">BTW · Excel</span>
           <span class="tag">Boekhouding</span>
           <span class="tag">Aangifte</span>
         </div>
@@ -1368,7 +1364,7 @@
           Korte berichten lezen we met aandacht.
         </p>
         <p class="contact-note">
-          Of mail direct naar <a href="/cdn-cgi/l/email-protection#35575047505b5175575c595918501b565a58"><span class="__cf_email__" data-cfemail="30525542555e547052595c5c1d551e535f5d">[email&#160;protected]</span></a>
+          Of mail direct naar <a href="/cdn-cgi/l/email-protection#85e7e0f7e0ebe1c5e7ece9e9a8e0abe6eae8"><span class="__cf_email__" data-cfemail="f0929582959e94b092999c9cdd95de939f9d">[email&#160;protected]</span></a>
         </p>
       </div>
 
@@ -1488,19 +1484,7 @@
     track.innerHTML = buildItems() + buildItems();
 
     // ─── Audience tabs (focus the selected card as featured) ─────────
-    const tabs = document.querySelectorAll('#who-tabs .who-tab');
-    const whoOrder = ['consument', 'zzp', 'mkb'];
-    const whoTrack = document.getElementById('who-grid-track');
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        tabs.forEach(t => t.dataset.active = String(t === tab));
-        document.querySelectorAll('.who-card').forEach(c => {
-          c.dataset.featured = String(c.dataset.card === tab.dataset.tab);
-        });
-        const idx = whoOrder.indexOf(tab.dataset.tab);
-        if (whoTrack && idx >= 0) whoTrack.style.setProperty('--slide', idx);
-      });
-    });
+    // Audience cards: hover to feature on desktop. No JS needed for tab state.
 
     // ─── Reveal on scroll ────────────────────────────────────────────
     const observer = new IntersectionObserver((entries) => {
