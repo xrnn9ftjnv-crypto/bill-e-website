@@ -3,7 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Bill-e — Digitale bonnen, automatisch</title>
+  <title>Bill-e — Digitale kassabonnen, automatisch gekoppeld</title>
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://www.bill-e.com/" />
+
+  <!-- Primary meta -->
+  <meta name="description" content="Bill-e koppelt kassabonnen automatisch aan jouw betaling. Een digitale bon zonder papier, scannen of app — met automatisch BTW-overzicht voor ZZP en MKB. Nu actief in Otterlo." />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="Bill-e" />
+
+  <!-- Hreflang -->
+  <link rel="alternate" hreflang="nl" href="https://www.bill-e.com/" />
+  <link rel="alternate" hreflang="x-default" href="https://www.bill-e.com/" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Bill-e — Digitale kassabonnen, automatisch" />
+  <meta property="og:description" content="Bill-e koppelt kassabonnen automatisch aan jouw betaling. Geen papier, geen scannen. Altijd inzicht — voor consumenten én bedrijven." />
+  <meta property="og:url" content="https://www.bill-e.com/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Bill-e" />
+  <meta property="og:locale" content="nl_NL" />
+  <meta property="og:image" content="https://www.bill-e.com/og-image.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Bill-e — digitale kassabon van Koe in Otterlo" />
+
+  <!-- Twitter card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Bill-e — Digitale kassabonnen, automatisch" />
+  <meta name="twitter:description" content="Bill-e koppelt kassabonnen automatisch aan jouw betaling. Geen papier, geen scannen." />
+  <meta name="twitter:image" content="https://www.bill-e.com/og-image.png" />
+
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Geist:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -1080,6 +1116,37 @@
     .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
     .reveal.visible { opacity: 1; transform: translateY(0); }
   </style>
+
+  <!-- Structured data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://www.bill-e.com/#organization",
+        "name": "Bill-e",
+        "url": "https://www.bill-e.com/",
+        "email": "berend@bill-e.com",
+        "description": "Bill-e koppelt kassabonnen automatisch aan betalingen. Een digitale bon zonder papier, scannen of app, met automatisch BTW-overzicht voor consumenten, ZZP'ers en MKB.",
+        "foundingDate": "2026",
+        "areaServed": "NL",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "NL"
+        }
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://www.bill-e.com/#website",
+        "url": "https://www.bill-e.com/",
+        "name": "Bill-e",
+        "inLanguage": "nl-NL",
+        "publisher": { "@id": "https://www.bill-e.com/#organization" }
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
 
@@ -1372,7 +1439,7 @@
           Korte berichten lezen we met aandacht.
         </p>
         <p class="contact-note">
-          Of mail direct naar <a href="/cdn-cgi/l/email-protection#20424552454e446042494c4c0d450e434f4d"><span class="__cf_email__" data-cfemail="6f0d0a1d0a010b2f0d060303420a410c0002">[email&#160;protected]</span></a>
+          Of mail direct naar <a href="mailto:berend@bill-e.com">berend@bill-e.com</a>
         </p>
       </div>
 
@@ -1425,7 +1492,7 @@
     </div>
   </div>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script>
     // ─── Defaults from EDITMODE block ──────────────────────────────
     const DEFAULTS = JSON.parse(
       document.getElementById('tweak-defaults').textContent
